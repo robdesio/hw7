@@ -151,8 +151,6 @@ exports.handler = async function(event) {
   returnValue.courseAverage = courseAverageRating
   returnValue.totalReviews = grandTotalReviews
  
-
-
   // return the standard response
   return {
     statusCode: 200,
