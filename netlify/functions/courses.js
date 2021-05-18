@@ -70,6 +70,10 @@ exports.handler = async function(event) {
   // get the documents from the query
   let sections = sectionsQuery.docs
 
+  // define variable to store running total, number of reviews
+  let grandTotalScore = 0
+  let grandTotalReviews = 0
+
   // loop through the documents
   for (let i=0; i < sections.length; i++) {
     // get the document ID of the section
@@ -107,7 +111,6 @@ exports.handler = async function(event) {
     sectionObject.averageScore = 0
     //Define total score variable for avg. calculation, number of reviews
     let reviewTotalScore = 0
-    let reviewTotalResponses = 0
 
     // loop through all the reviews within the section
     for (j = 0; j < reviews.length ; j++){
@@ -132,19 +135,22 @@ exports.handler = async function(event) {
       sectionObject.reviews.push(reviewObject)
     
     }
+    // Calculate average for each section, push
     sectionObject.averageScore = reviewTotalScore/sectionObject.totalResponses
+    // Calculate running total of score & number of reviews
+    grandTotalScore = grandTotalScore + (sectionObject.totalResponses*sectionObject.averageScore)
+    grandTotalReviews = grandTotalReviews + sectionObject.totalResponses
+    // console log to check
+    //console.log(grandTotalScore)
+    //console.log(grandTotalReviews)
   }
-  // this is where I left off - need to figure out how to calculate course total average.
-  // calculate grand average rating and number of reviews, start the loop!!!
-  for (k = 0; k < sections.length ; k++) {
-    let section = sections[k]
-    //get total number of reviews and average score from each section
-    let sectionTotal=section.totalResponses
-    console.log(sectionTotal)
-    
+  // calculate total course average
+  let courseAverageRating = grandTotalScore/grandTotalReviews
 
-
-  }
+  // add course average and total reviews to the return value
+  returnValue.courseAverage = courseAverageRating
+  returnValue.totalReviews = grandTotalReviews
+ 
 
 
   // return the standard response
