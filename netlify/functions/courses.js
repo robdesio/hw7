@@ -94,7 +94,58 @@ exports.handler = async function(event) {
     returnValue.sections.push(sectionObject)
 
     // 🔥 your code for the reviews/ratings goes here
+
+    // get reviews from firebase for a section
+    let reviewQuery = await db.collection('reviews').where('sectionId',"==", sectionId).get()
+
+    // get data from returned section
+    let reviews = reviewQuery.docs
+
+    //create reviews array within section object
+    sectionObject.reviews = []
+    sectionObject.totalResponses = 0
+    sectionObject.averageScore = 0
+    //Define total score variable for avg. calculation, number of reviews
+    let reviewTotalScore = 0
+    let reviewTotalResponses = 0
+
+    // loop through all the reviews within the section
+    for (j = 0; j < reviews.length ; j++){
+      let review = reviews[j]
+      // get the ID from the review
+      let reviewId = review.id
+      //console.log(`The Review ID is: ${reviewId}`)
+
+      //get data from the comment
+      let reviewData = review.data()
+      
+      // create object to be added to array
+      let reviewObject = {
+        id: reviewId,
+        rating: reviewData.rating, 
+        body: reviewData.body
+      }
+      // add up total score and number of reviews
+      reviewTotalScore = reviewTotalScore + Number(reviewObject.rating)
+      sectionObject.totalResponses = sectionObject.totalResponses + 1
+      // push review into the section
+      sectionObject.reviews.push(reviewObject)
+    
+    }
+    sectionObject.averageScore = reviewTotalScore/sectionObject.totalResponses
   }
+  // this is where I left off - need to figure out how to calculate course total average.
+  // calculate grand average rating and number of reviews, start the loop!!!
+  for (k = 0; k < sections.length ; k++) {
+    let section = sections[k]
+    //get total number of reviews and average score from each section
+    let sectionTotal=section.totalResponses
+    console.log(sectionTotal)
+    
+
+
+  }
+
 
   // return the standard response
   return {
